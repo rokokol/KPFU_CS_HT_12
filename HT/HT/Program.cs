@@ -104,26 +104,9 @@ namespace HT
                 Console.ReadKey();
             }
 
-            void Second()
+            async void Second()
             {
                 Message("tests async-factorial and sync-square threads", 2);
-                ParameterizedThreadStart factorial = delegate(object x)
-                {
-                    int res = 1;
-                    int i = (int)x;
-                    while (i > 1)
-                    {
-                        res *= i--;
-                    }
-                    Thread.Sleep(8000);
-                    Console.WriteLine(res);
-                };
-                
-                ParameterizedThreadStart square = delegate(object x)
-                {
-                    Console.WriteLine((double)x * (double)x);
-                };
-
                 bool term = true;
                 while (term)
                 {
@@ -133,12 +116,10 @@ namespace HT
                     switch (resp)
                     {
                         case "f":
-                            Thread fact = new Thread(factorial);
                             Console.WriteLine("Enter a natural number:");
-                            fact.Start(ReadInt(true, false));
+                            await Factorial(ReadInt(true, false));
                             break;
-                        case "s":
-                            Thread sq = new Thread(square);
+                        case "s":   
                             Console.WriteLine("Enter a number:");
                             Offer();
                             double x;
@@ -147,7 +128,7 @@ namespace HT
                                 Console.WriteLine("It is not a rational number. Please, try again:");
                                 Offer();
                             }
-                            sq.Start(x);
+                            Square(x);
                             break;
                         case "e":
                             term = false;
@@ -157,11 +138,38 @@ namespace HT
                             break;
                     }
                 }
+                return;
+                async Task Factorial(int i)
+                {
+                    await Task.Run(() =>
+                    {
+                        int res = 1;
+                        while (i > 1)
+                        {
+                            res *= i--;
+                        }
+
+                        Thread.Sleep(8000);
+                        Console.WriteLine(res);         
+                    });
+                }
+                
+                void Square(double x)
+                {
+                    Console.WriteLine(x * x);
+                }
+
             }
 
             void Third()
             {
-                
+                Message("returns name of each method of Refl", 3);
+                Refl refl = new Refl();
+
+                foreach (var methodInfo in refl.GetType().GetMethods())
+                {
+                    Console.WriteLine(methodInfo);
+                }
             }
 
             #endregion
