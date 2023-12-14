@@ -49,23 +49,6 @@ namespace HT
         }
         
         /// <summary>
-        /// Synchronise factorial
-        /// </summary>
-        /// <param name="i">The value</param>
-        /// <returns></returns>
-        static int SyncFact(int i)
-        {
-            int res = 1;
-            while (i > 1)
-            {
-                res *= i--;
-            }
-
-            Thread.Sleep(8000);
-            return res;
-        }
-        
-        /// <summary>
         /// Writes a number of the task.
         /// </summary>
         /// <param name="message">Message.</param>
@@ -122,15 +105,27 @@ namespace HT
                 Console.ReadKey();
             }
 
-            async void Second()
+            void Second()
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.WriteLine("!!!Я ПРАВДА ПЫТАЛСЯ ВСЕ СДЕЛАТЬ НОРМАЛЬНО, НО ПОСЛЕ ФАКТОРИАЛА ОН ПОСТОЯННО ЛОМАЕТСЯ");
-                Console.WriteLine("ВО ВТОРОМ КОММИТЕ ВЕРСИЯ ЭТОГО ЗАДАНИЯ С ПОТОКАМИ ВМЕСТО await, КОТОРАЯ РАБОТАЛА КОРРЕКТНО!!!");
-                Console.ResetColor();
-
+                // В коммите "Second?" есть версия с async и await, но она работала как-то неправильно
                 Message("tests async-factorial and sync-square threads", 2);
+                ParameterizedThreadStart factorial = delegate(object x)
+                {
+                    int res = 1;
+                    int i = (int)x;
+                    while (i > 1)
+                    {
+                        res *= i--;
+                    }
+                    Thread.Sleep(8000);
+                    Console.WriteLine(res);
+                };
+
+                void Square(double x)
+                {
+                    Console.WriteLine(x * x);
+                }
+
                 bool term = true;
                 while (term)
                 {
@@ -140,12 +135,11 @@ namespace HT
                     switch (resp)
                     {
                         case "f":
+                            Thread fact = new Thread(factorial);
                             Console.WriteLine("Enter a natural number:");
-                            Console.WriteLine(await Factorial(ReadInt(true, false)));
-                            Console.WriteLine("Press any key to continue...");
-                            Console.ReadKey();
+                            fact.Start(ReadInt(true, false));
                             break;
-                        case "s":   
+                        case "s":
                             Console.WriteLine("Enter a number:");
                             Offer();
                             double x;
@@ -164,17 +158,6 @@ namespace HT
                             break;
                     }
                 }
-                return;
-                async Task<int> Factorial(int i)
-                {
-                    return await Task.Run(() => SyncFact(i));
-                }
-                
-                void Square(double x)
-                {
-                    Console.WriteLine(x * x);
-                }
-
             }
 
             void Third()
