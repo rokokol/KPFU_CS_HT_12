@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,6 +49,23 @@ namespace HT
         }
         
         /// <summary>
+        /// Synchronise factorial
+        /// </summary>
+        /// <param name="i">The value</param>
+        /// <returns></returns>
+        static int SyncFact(int i)
+        {
+            int res = 1;
+            while (i > 1)
+            {
+                res *= i--;
+            }
+
+            Thread.Sleep(8000);
+            return res;
+        }
+        
+        /// <summary>
         /// Writes a number of the task.
         /// </summary>
         /// <param name="message">Message.</param>
@@ -60,7 +78,7 @@ namespace HT
         }
 
         
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             #region HT
 
@@ -106,6 +124,12 @@ namespace HT
 
             async void Second()
             {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.WriteLine("!!!Я ПРАВДА ПЫТАЛСЯ ВСЕ СДЕЛАТЬ НОРМАЛЬНО, НО ПОСЛЕ ФАКТОРИАЛА ОН ПОСТОЯННО ЛОМАЕТСЯ");
+                Console.WriteLine("ВО ВТОРОМ КОММИТЕ ВЕРСИЯ ЭТОГО ЗАДАНИЯ С ПОТОКАМИ ВМЕСТО await, КОТОРАЯ РАБОТАЛА КОРРЕКТНО!!!");
+                Console.ResetColor();
+
                 Message("tests async-factorial and sync-square threads", 2);
                 bool term = true;
                 while (term)
@@ -117,7 +141,9 @@ namespace HT
                     {
                         case "f":
                             Console.WriteLine("Enter a natural number:");
-                            await Factorial(ReadInt(true, false));
+                            Console.WriteLine(await Factorial(ReadInt(true, false)));
+                            Console.WriteLine("Press any key to continue...");
+                            Console.ReadKey();
                             break;
                         case "s":   
                             Console.WriteLine("Enter a number:");
@@ -139,19 +165,9 @@ namespace HT
                     }
                 }
                 return;
-                async Task Factorial(int i)
+                async Task<int> Factorial(int i)
                 {
-                    await Task.Run(() =>
-                    {
-                        int res = 1;
-                        while (i > 1)
-                        {
-                            res *= i--;
-                        }
-
-                        Thread.Sleep(8000);
-                        Console.WriteLine(res);         
-                    });
+                    return await Task.Run(() => SyncFact(i));
                 }
                 
                 void Square(double x)
@@ -164,11 +180,10 @@ namespace HT
             void Third()
             {
                 Message("returns name of each method of Refl", 3);
-                Refl refl = new Refl();
-
-                foreach (var methodInfo in refl.GetType().GetMethods())
+                
+                foreach (var methodInfo in typeof(Refl).GetMethods())
                 {
-                    Console.WriteLine(methodInfo);
+                    Console.WriteLine($"{methodInfo}, {methodInfo.MemberType}");
                 }
             }
 
