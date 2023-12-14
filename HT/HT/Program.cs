@@ -166,7 +166,7 @@ namespace HT
                 
                 foreach (var methodInfo in typeof(Refl).GetMethods())
                 {
-                    Console.WriteLine($"{methodInfo}, {methodInfo.MemberType}");
+                    Console.WriteLine(methodInfo.Name);
                 }
             }
 
